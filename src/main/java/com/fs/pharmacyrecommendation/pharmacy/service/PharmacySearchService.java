@@ -1,5 +1,6 @@
 package com.fs.pharmacyrecommendation.pharmacy.service;
 
+import com.fs.pharmacyrecommendation.pharmacy.cache.PharmacyRedisTemplateService;
 import com.fs.pharmacyrecommendation.pharmacy.dto.PharmacyDto;
 import com.fs.pharmacyrecommendation.pharmacy.entity.Pharmacy;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,16 @@ import java.util.stream.Collectors;
 public class PharmacySearchService {
 
     private final PharmacyRepositoryService pharmacyRepositoryService;
+    private final PharmacyRedisTemplateService pharmacyRedisTemplateService;
 
     public List<PharmacyDto> searchPharmacyDtoList() {
 
         // redis
+        List<PharmacyDto> pharmacyDtoList = pharmacyRedisTemplateService.findAll();
+        if(!pharmacyDtoList.isEmpty()) {
+            log.info("redis findAll success!");
+            return pharmacyDtoList;
+        }
 
         //db
         return pharmacyRepositoryService.findAll().stream().map(this::convertToPharmacyDto).collect(Collectors.toList());
